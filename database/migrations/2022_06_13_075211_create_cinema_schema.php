@@ -36,7 +36,52 @@ class CreateCinemaSchema extends Migration
      */
     public function up()
     {
-        throw new \Exception('implement in coding task 4, you can ignore this exception if you are just running the initial migrations.');
+        Schema::create('movies', function (Blueprint $table) {
+            $table->id();
+            $table->json('name')->nullable(false);
+            $table->integer('genre')->nullable(false);
+            $table->string('release_date')->nullable(false);
+            $table->integer('available_seats')->nullable(false);
+            $table->timestamps();
+        });
+
+        Schema::create('Booking', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('movie_id')->nullable(false)->constrained('movies');
+            $table->foreignId('user_id')->nullable(false)->constrained('users');
+            $table->foreignId('showroom_id')->nullable(false)->constrained('showroom');
+            $table->enum('slot', ['evening', 'night']);
+            $table->timestamps();
+        });
+
+        Schema::create('showroom', function (Blueprint $table) {
+            $table->id();
+            $table->string('name')->nullable(false);
+            $table->string('place')->nullable(false);
+            $table->timestamps();
+        });
+        Schema::create('pricing', function (Blueprint $table) {
+            $table->id();
+            $table->foreignId('movie_id')->nullable(false)->constrained('movies');
+            $table->foreignId('showroom_id')->nullable(false)->constrained('showroom');
+            $table->foreignId('booking_id')->nullable(false)->constrained('booking');
+            $table->foreignId('seat_id')->nullable(false)->constrained('seat');
+            $table->string('amount')->nullable(false);
+            $table->timestamps();
+        });
+
+        Schema::seat('user', function (Blueprint $table) {
+            $table->id();
+            $table->string('name')->nullable(false);
+            $table->timestamps();
+        });
+
+        Schema::seat('seat', function (Blueprint $table) {
+            $table->id();
+            $table->enum('type', ['premium', 'average','common']);
+            $table->string('amount')->nullable(false);
+            $table->timestamps();
+        });
     }
 
     /**

@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\Event;
+use App\Models\Workshop;
+use Exception;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 use Illuminate\Foundation\Bus\DispatchesJobs;
 use Illuminate\Foundation\Validation\ValidatesRequests;
@@ -101,7 +103,19 @@ class EventsController extends BaseController
      */
 
     public function getEventsWithWorkshops() {
-        throw new \Exception('implement in coding task 1');
+        try{
+            $result = Event::with('workshop');
+            return response()->json([
+                'data' => $result,
+                'message' => 'Data found'
+            ], 200);
+        }
+        catch(Exception $e){
+
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 422);
+        }
     }
 
 
@@ -179,6 +193,22 @@ class EventsController extends BaseController
      */
 
     public function getFutureEventsWithWorkshops() {
+        $currDate = date("Y-m-d H:i:s");  
+        try{
+            $workshopData = Workshop::select('event_id')->where($currDate, '<' ,'start')->get();
+            $result = Event::whereIn('id',$workshopData['event_id'])->get();
+            
+            return response()->json([
+                'data' => $result,
+                'message' => 'Data found'
+            ], 200);
+        }
+        catch(Exception $e){
+
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 422);
+        }
         throw new \Exception('implement in coding task 2');
     }
 }
